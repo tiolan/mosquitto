@@ -376,6 +376,11 @@ int mosquitto_loop_read(struct mosquitto *mosq, int max_packets)
 			rc = socks5__read(mosq);
 		}else
 #endif
+#ifdef WITH_HTTP
+		if(mosq->http_host){
+			rc = http__read(mosq);
+		}else
+#endif
 		{
 			rc = packet__read(mosq);
 		}

@@ -116,6 +116,8 @@ enum mosquitto_client_state {
 	mosq_cs_disused = 19, /* client that has been added to the disused list to be freed */
 	mosq_cs_authenticating = 20, /* Client has sent CONNECT but is still undergoing extended authentication */
 	mosq_cs_reauthenticating = 21, /* Client is undergoing reauthentication and shouldn't do anything else until complete */
+    mosq_cs_http_new = 22,
+	mosq_cs_http_start = 23,
 };
 
 enum mosquitto__protocol {
@@ -312,6 +314,12 @@ struct mosquitto {
 	uint16_t socks5_port;
 	char *socks5_username;
 	char *socks5_password;
+#  endif
+#  ifdef WITH_HTTP
+	char *http_host;
+	uint16_t http_port;
+	char *http_username;
+	char *http_password;
 #  endif
 	void *userdata;
 	bool in_callback;

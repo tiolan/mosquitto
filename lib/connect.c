@@ -30,6 +30,7 @@ Contributors:
 #include "net_mosq.h"
 #include "send_mosq.h"
 #include "socks_mosq.h"
+#include "http_mosq.h"
 #include "util_mosq.h"
 
 static char alphanum[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -201,6 +202,11 @@ static int mosquitto__reconnect(struct mosquitto *mosq, bool blocking)
 		rc = net__socket_connect(mosq, mosq->socks5_host, mosq->socks5_port, mosq->bind_address, blocking);
 	}else
 #endif
+#ifdef WITH_HTTP
+	if(mosq->http_host){
+		rc = net__socket_connect(mosq, mosq->http_host, mosq->http_port, mosq->bind_address, blocking);
+	}else
+#endif
 	{
 		rc = net__socket_connect(mosq, mosq->host, mosq->port, mosq->bind_address, blocking);
 	}
@@ -213,6 +219,12 @@ static int mosquitto__reconnect(struct mosquitto *mosq, bool blocking)
 	if(mosq->socks5_host){
 		mosquitto__set_state(mosq, mosq_cs_socks5_new);
 		return socks5__send(mosq);
+	}else
+#endif
+#ifdef WITH_HTTP
+	if(mosq->http_host){
+		mosquitto__set_state(mosq, mosq_cs_http_new);
+		return http__send(mosq);
 	}else
 #endif
 	{

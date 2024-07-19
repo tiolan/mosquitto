@@ -38,8 +38,9 @@ Contributors:
 #include <mqtt_protocol.h>
 #include "client_shared.h"
 
-#ifdef WITH_SOCKS
-static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url);
+#if defined(WITH_SOCKS) || defined(WITH_HTTP)
+//TODO: rename mosquitto__parse_proxy_url
+static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url, const char* protocol);
 #endif
 static int client_config_line_proc(struct mosq_config *cfg, int pub_or_sub, int argc, char *argv[]);
 
@@ -258,6 +259,11 @@ void client_config_cleanup(struct mosq_config *cfg)
 	free(cfg->socks5_host);
 	free(cfg->socks5_username);
 	free(cfg->socks5_password);
+#endif
+#ifdef WITH_SOCKS
+	free(cfg->http_host);
+	free(cfg->http_username);
+	free(cfg->http_password);
 #endif
 	mosquitto_property_free_all(&cfg->connect_props);
 	mosquitto_property_free_all(&cfg->publish_props);
@@ -873,7 +879,19 @@ int client_config_line_proc(struct mosq_config *cfg, int pub_or_sub, int argc, c
 				fprintf(stderr, "Error: --proxy argument given but no proxy url specified.\n\n");
 				return 1;
 			}else{
-				if(mosquitto__parse_socks_url(cfg, argv[i+1])){
+				if(mosquitto__parse_socks_url(cfg, argv[i+1], "socks5h://")){
+					return 1;
+				}
+				i++;
+			}
+#endif
+#ifdef WITH_HTTP
+		}else if(!strcmp(argv[i], "--http-proxy")){
+			if(i==argc-1){
+				fprintf(stderr, "Error: --http-proxy argument given but no http-proxy url specified.\n\n");
+				return 1;
+			}else{
+				if(mosquitto__parse_socks_url(cfg, argv[i+1], "http://")){
 					return 1;
 				}
 				i++;
@@ -1231,7 +1249,7 @@ unknown_option:
 
 int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg)
 {
-#if defined(WITH_TLS) || defined(WITH_SOCKS)
+#if defined(WITH_TLS) || defined(WITH_SOCKS) || defined(WITH_HTTP)
 	int rc;
 #endif
 
@@ -1320,6 +1338,15 @@ int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg)
 		}
 	}
 #endif
+#ifdef WITH_HTTP
+	if(cfg->http_host){
+		rc = mosquitto_http_set(mosq, cfg->http_host, cfg->http_port, cfg->http_username, cfg->http_password);
+		if(rc){
+			mosquitto_lib_cleanup();
+			return rc;
+		}
+	}
+#endif
 	if(cfg->tcp_nodelay){
 		mosquitto_int_option(mosq, MOSQ_OPT_TCP_NODELAY, 1);
 	}
@@ -1400,7 +1427,7 @@ int client_connect(struct mosquitto *mosq, struct mosq_config *cfg)
 	return MOSQ_ERR_SUCCESS;
 }
 
-#ifdef WITH_SOCKS
+#if defined(WITH_SOCKS) || defined(WITH_HTTP)
 /* Convert %25 -> %, %3a, %3A -> :, %40 -> @ */
 static int mosquitto__urldecode(char *str)
 {
@@ -1445,7 +1472,7 @@ static int mosquitto__urldecode(char *str)
 	return 0;
 }
 
-static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url)
+static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url, const char* protocol)
 {
 	char *str;
 	size_t i;
@@ -1456,8 +1483,8 @@ static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url)
 	bool have_auth = false;
 	int port_int;
 
-	if(!strncmp(url, "socks5h://", strlen("socks5h://"))){
-		str = url + strlen("socks5h://");
+	if(!strncmp(url, protocol, strlen(protocol))){
+		str = url + strlen(protocol);
 	}else{
 		err_printf(cfg, "Error: Unsupported proxy protocol: %s\n", url);
 		return 1;
@@ -1603,12 +1630,18 @@ static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url)
 	}else{
 		port_int = 1080;
 	}
-
+#ifdef WITH_SOCKS
 	cfg->socks5_username = username;
 	cfg->socks5_password = password;
 	cfg->socks5_host = host;
 	cfg->socks5_port = port_int;
-
+#endif
+#ifdef WITH_HTTP
+	cfg->http_username = username;
+	cfg->http_password = password;
+	cfg->http_host = host;
+	cfg->http_port = port_int;
+#endif
 	return 0;
 cleanup:
 	free(username_or_host);

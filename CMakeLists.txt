@@ -52,11 +52,16 @@ option(WITH_UNIX_SOCKETS "Include Unix Domain Socket support?" ON)
 if (WITH_UNIX_SOCKETS AND NOT WIN32)
 	add_definitions("-DWITH_UNIX_SOCKETS")
 endif (WITH_UNIX_SOCKETS AND NOT WIN32)
-
-option(WITH_SOCKS "Include SOCKS5 support?" ON)
+#TODO! Revert to default to socks
+option(WITH_SOCKS "Include SOCKS5 support?" OFF)#ON)
 if (WITH_SOCKS)
 	add_definitions("-DWITH_SOCKS")
 endif (WITH_SOCKS)
+
+option(WITH_HTTP "Include HTTP support?" ON)#OFF)
+if(WITH_HTTP)
+    add_definitions("-DWITH_HTTP")
+endif(WITH_HTTP)
 
 option(WITH_SRV "Include SRV lookup support?" OFF)
 
@@ -114,7 +119,10 @@ option(WITH_CLIENTS "Build clients?" ON)
 option(WITH_BROKER "Build broker?" ON)
 option(WITH_APPS "Build apps?" ON)
 option(WITH_PLUGINS "Build plugins?" ON)
-option(DOCUMENTATION "Build documentation?" ON)
+#TODO: Revert
+option(DOCUMENTATION "Build documentation?" OFF)#ON)
+#TODO: Revert
+add_definitions(-DOPENSSL_NO_ENGINE)
 
 add_subdirectory(lib)
 if (WITH_CLIENTS)

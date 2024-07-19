@@ -357,6 +357,10 @@ int mosquittopp::socks5_set(const char *host, int port, const char *username, co
 	return mosquitto_socks5_set(m_mosq, host, port, username, password);
 }
 
+int mosquittopp::http_set(const char *host, int port, const char *username, const char *password)
+{
+    return mosquitto_http_set(m_mosq, host, port, username, password);
+}
 
 int mosquittopp::tls_set(const char *cafile, const char *capath, const char *certfile, const char *keyfile, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
 {

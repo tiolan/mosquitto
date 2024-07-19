@@ -78,6 +78,9 @@ WITH_DOCS:=yes
 # Build with client support for SOCK5 proxy.
 WITH_SOCKS:=yes
 
+# Build with client support for HTTP proxy.
+WITH_SOCKS:=no
+
 # Strip executables and shared libraries on install.
 WITH_STRIP:=no
 
@@ -272,6 +275,11 @@ endif
 ifeq ($(WITH_SOCKS),yes)
 	LIB_CPPFLAGS:=$(LIB_CPPFLAGS) -DWITH_SOCKS
 	CLIENT_CPPFLAGS:=$(CLIENT_CPPFLAGS) -DWITH_SOCKS
+endif
+
+ifeq ($(WITH_HTTP),yes)
+	LIB_CPPFLAGS:=$(LIB_CPPFLAGS) -DWITH_HTTP
+	CLIENT_CPPFLAGS:=$(CLIENT_CPPFLAGS) -DWITH_HTTP
 endif
 
 ifeq ($(WITH_BRIDGE),yes)

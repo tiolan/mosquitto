@@ -50,6 +50,7 @@ set(C_SRC
 	send_unsubscribe.c
 	send_mosq.c send_mosq.h
 	socks_mosq.c
+	http_mosq.c
 	srv_mosq.c
 	strings_mosq.c
 	thread_mosq.c

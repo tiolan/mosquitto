@@ -2276,6 +2276,30 @@ libmosq_EXPORT int mosquitto_socks5_set(struct mosquitto *mosq, const char *host
 
 /* =============================================================================
  *
+ * Section: HTTP proxy functions
+ *
+ * =============================================================================
+ */
+
+/*
+ * Function: mosquitto_http_set
+ *
+ * Configure the client to use an HTTP proxy when connecting. Must be called
+ * before connecting. "None" and "username/password" authentication is
+ * supported.
+ *
+ * Parameters:
+ *   mosq - a valid mosquitto instance.
+ *   host - the HTTP proxy host to connect to.
+ *   port - the HTTP proxy port to use.
+ *   username - if not NULL, use this username when authenticating with the proxy.
+ *   password - if not NULL and username is not NULL, use this password when
+ *              authenticating with the proxy.
+ */
+libmosq_EXPORT int mosquitto_http_set(struct mosquitto *mosq, const char *host, int port, const char *username, const char *password);
+
+/* =============================================================================
+ *
  * Section: Utility functions
  *
  * =============================================================================

@@ -31,6 +31,11 @@ Contributors:
 #define __attribute__(attrib)
 #endif
 
+// TODO: Should it be mutually exclusive?
+#if defined(WITH_SOCKS) && defined(WITH_HTTP)
+  #error "WITH_SOCKS and WITH_HTTP are mutually exclusive"
+#endif
+
 /* pub_client.c modes */
 #define MSGMODE_NONE 0
 #define MSGMODE_CMD 1
@@ -120,6 +125,13 @@ struct mosq_config {
 	int socks5_port;
 	char *socks5_username;
 	char *socks5_password;
+#endif
+// TODO: One variable proxy_host etc, only possible when mutually exclusive?
+#ifdef WITH_HTTP
+	char *http_host;
+	int http_port;
+	char *http_username;
+	char *http_password;
 #endif
 	mosquitto_property *connect_props;
 	mosquitto_property *publish_props;

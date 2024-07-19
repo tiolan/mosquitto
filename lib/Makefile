@@ -200,6 +200,9 @@ send_unsubscribe.o : send_unsubscribe.c send_mosq.h
 socks_mosq.o : socks_mosq.c
 	${CROSS_COMPILE}$(CC) $(LIB_CPPFLAGS) $(LIB_CFLAGS) -c $< -o $@
 
+http_mosq.o : http_mosq.c
+	${CROSS_COMPILE}$(CC) $(LIB_CPPFLAGS) $(LIB_CFLAGS) -c $< -o $@
+
 srv_mosq.o : srv_mosq.c
 	${CROSS_COMPILE}$(CC) $(LIB_CPPFLAGS) $(LIB_CFLAGS) -c $< -o $@
 
