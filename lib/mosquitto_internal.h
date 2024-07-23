@@ -116,8 +116,8 @@ enum mosquitto_client_state {
 	mosq_cs_disused = 19, /* client that has been added to the disused list to be freed */
 	mosq_cs_authenticating = 20, /* Client has sent CONNECT but is still undergoing extended authentication */
 	mosq_cs_reauthenticating = 21, /* Client is undergoing reauthentication and shouldn't do anything else until complete */
-    mosq_cs_http_new = 22,
-	mosq_cs_http_start = 23,
+	mosq_cs_http_new = 22,
+	mosq_cs_http_connect = 23,
 };
 
 enum mosquitto__protocol {

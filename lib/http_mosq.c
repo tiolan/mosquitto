@@ -150,7 +150,7 @@ int http__send(struct mosquitto *mosq)
 			packet->packet_length += length;
 		}
 
-		mosquitto__set_state(mosq, mosq_cs_http_start);
+		mosquitto__set_state(mosq, mosq_cs_http_connect);
 
 		// TODO: How does this work with unknown size?
 		mosq->in_packet.pos = 0;
@@ -177,7 +177,7 @@ int http__read(struct mosquitto *mosq)
 
 	state = mosquitto__get_state(mosq);
 
-	if(state == mosq_cs_http_start){
+	if(state == mosq_cs_http_connect){
 		while(mosq->in_packet.to_process > 0){
 			len = net__read(mosq, &(mosq->in_packet.payload[mosq->in_packet.pos]), mosq->in_packet.to_process);
 			if(len > 0){
@@ -203,8 +203,34 @@ int http__read(struct mosquitto *mosq)
 			}
 		}
 
+		// TODO: parse response and get HTTP status
+
 		/* Entire packet is now read. */
 		packet__cleanup(&mosq->in_packet);
+
+#if 0
+		// TODO: map HTTP status to mosquitto status and return or error
+		mosquitto__set_state(mosq, mosq_cs_http_new);
+		switch(httpState){
+			case HTTP_REPLY_CONNECTION_NOT_ALLOWED:
+				return MOSQ_ERR_AUTH;
+
+			case HTTP_REPLY_NETWORK_UNREACHABLE:
+			case HTTP_REPLY_HOST_UNREACHABLE:
+			case HTTP_REPLY_CONNECTION_REFUSED:
+				return MOSQ_ERR_NO_CONN;
+
+			case HTTP_REPLY_GENERAL_FAILURE:
+			case HTTP_REPLY_TTL_EXPIRED:
+			case HTTP_REPLY_COMMAND_NOT_SUPPORTED:
+			case HTTP_REPLY_ADDRESS_TYPE_NOT_SUPPORTED:
+				return MOSQ_ERR_PROXY;
+
+			default:
+				return MOSQ_ERR_INVAL;
+		}
+#endif
+
 		mosquitto__set_state(mosq, mosq_cs_new);
 		if(mosq->http_host){ // TODO: Why this if here?
 			int rc = net__socket_connect_step3(mosq, mosq->host);

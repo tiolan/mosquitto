@@ -926,6 +926,9 @@ int net__socket_connect(struct mosquitto *mosq, const char *host, uint16_t port,
 #if defined(WITH_SOCKS) && !defined(WITH_BROKER)
 	if(!mosq->socks5_host)
 #endif
+#if defined(WITH_HTTP) && !defined(WITH_BROKER)
+	if(!mosq->http_host)
+#endif
 	{
 		rc2 = net__socket_connect_step3(mosq, host);
 		if(rc2) return rc2;

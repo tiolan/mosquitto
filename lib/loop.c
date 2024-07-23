@@ -29,6 +29,7 @@ Contributors:
 #include "net_mosq.h"
 #include "packet_mosq.h"
 #include "socks_mosq.h"
+#include "http_mosq.h"
 #include "tls_mosq.h"
 #include "util_mosq.h"
 

@@ -33,6 +33,8 @@ option(WITH_TLS_PSK
 option(WITH_EC
 	"Include Elliptic Curve support (requires WITH_TLS)?" ON)
 if (WITH_TLS)
+	set(OPENSSL_USE_STATIC_LIBS ON)
+	set(OPENSSL_ROOT_DIR ~/.conan/data/openssl/3.2.0/_/_/package/8154fb2ac7ad7be1dafe7b5ff0b27ffd8a59a171/)
 	find_package(OpenSSL REQUIRED)
 	add_definitions("-DWITH_TLS")
 
@@ -65,7 +67,8 @@ endif(WITH_HTTP)
 
 option(WITH_SRV "Include SRV lookup support?" OFF)
 
-option(WITH_STATIC_LIBRARIES "Build static versions of the libmosquitto/pp libraries?" OFF)
+# TODO: revert
+option(WITH_STATIC_LIBRARIES "Build static versions of the libmosquitto/pp libraries?" ON)
 option(WITH_PIC "Build the static library with PIC (Position Independent Code) enabled archives?" OFF)
 
 option(WITH_THREADING "Include client library threading support?" ON)
@@ -121,8 +124,6 @@ option(WITH_APPS "Build apps?" ON)
 option(WITH_PLUGINS "Build plugins?" ON)
 #TODO: Revert
 option(DOCUMENTATION "Build documentation?" OFF)#ON)
-#TODO: Revert
-add_definitions(-DOPENSSL_NO_ENGINE)
 
 add_subdirectory(lib)
 if (WITH_CLIENTS)
